@@ -1,0 +1,3419 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Hệ thống Đăng ký Học phần Trực tuyến",
+    "description": "API hỗ trợ đăng nhập, tra cứu lớp học phần, đăng ký và hủy đăng ký học phần. Tài liệu cung cấp thông tin đầu vào, kết quả trả về và cách xác thực cho từng chức năng.",
+    "version": "1.0.0",
+    "x-spec-version": "3.0"
+  },
+  "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Đăng nhập bằng mã sinh viên/quản trị và mật khẩu",
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_AuthTokenData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "JSON hỏng hoặc dữ liệu không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sai tài khoản hoặc mật khẩu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sai Content-Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Quá giới hạn tần suất",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Làm mới cặp access/refresh token nguyên tử",
+        "operationId": "refresh_tokens_api_v1_auth_refresh_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_AuthTokenData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "JSON hỏng hoặc thiếu refresh_token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh token không hợp lệ hoặc hết hạn",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sai Content-Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Thu hồi phiên đăng nhập hiện tại",
+        "operationId": "logout_api_v1_auth_logout_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_LogoutData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "JSON hỏng hoặc thiếu refresh_token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token hết hạn hoặc refresh token khác phiên",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sai Content-Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/sso/login": {
+      "get": {
+        "tags": [
+          "SSO"
+        ],
+        "summary": "Khởi tạo giao dịch SSO OIDC + PKCE S256",
+        "operationId": "sso_login_api_v1_auth_sso_login_get",
+        "responses": {
+          "302": {
+            "description": "Chuyển hướng sang Keycloak OIDC Authorization Endpoint"
+          },
+          "400": {
+            "description": "Tham số truy vấn không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "SSO chưa được bật",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/sso/callback": {
+      "get": {
+        "tags": [
+          "SSO"
+        ],
+        "summary": "Nhận callback OIDC từ Keycloak và phát mã trao đổi 60 giây",
+        "operationId": "sso_callback_api_v1_auth_sso_callback_get",
+        "responses": {
+          "302": {
+            "description": "Chuyển hướng về FRONTEND_ORIGIN/sso/callback"
+          },
+          "503": {
+            "description": "SSO chưa được bật",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/sso/exchange": {
+      "post": {
+        "tags": [
+          "SSO"
+        ],
+        "summary": "Đổi mã một lần exchange_code lấy cặp access/refresh token nội bộ",
+        "operationId": "sso_exchange_api_v1_auth_sso_exchange_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SsoExchangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_AuthTokenData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "JSON hỏng hoặc thiếu exchange_code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Mã SSO sai, hết hạn hoặc đã dùng",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sai Content-Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "SSO chưa được bật",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/course-classes": {
+      "get": {
+        "tags": [
+          "Course Classes"
+        ],
+        "summary": "Danh sách lớp học phần kèm trạng thái đăng ký của người gọi",
+        "operationId": "list_course_classes_api_v1_course_classes_get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Trang (>= 1)",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "Trang (>= 1)"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Kích thước trang (1–100)",
+              "default": 20,
+              "title": "Page Size"
+            },
+            "description": "Kích thước trang (1–100)"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Từ khóa tìm theo mã lớp hoặc tên học phần (<= 100 ký tự)",
+              "title": "Q"
+            },
+            "description": "Từ khóa tìm theo mã lớp hoặc tên học phần (<= 100 ký tự)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_CourseClassListData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tham số phân trang hoặc tìm kiếm sai",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/course-classes/{course_class_id}": {
+      "get": {
+        "tags": [
+          "Course Classes"
+        ],
+        "summary": "Chi tiết một lớp học phần kèm trạng thái của người gọi",
+        "operationId": "get_course_class_detail_api_v1_course_classes__course_class_id__get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course_class_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "LHP001"
+              ],
+              "title": "Course Class Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_CourseClassDetailData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Mã lớp sai định dạng",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Lớp không tồn tại",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/register": {
+      "post": {
+        "tags": [
+          "Registrations"
+        ],
+        "summary": "Đăng ký lớp học phần nguyên tử có kiểm soát đồng thời và Idempotency-Key",
+        "operationId": "register_course_class_api_v1_register_post",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Queue-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token lượt đăng ký từ `/api/v1/queue/status` khi hàng đợi bật.",
+              "title": "X-Queue-Token"
+            },
+            "description": "Token lượt đăng ký từ `/api/v1/queue/status` khi hàng đợi bật."
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "UUID v4 duy nhất cho mỗi ý định thao tác ghi (Spec Mục 18).",
+              "examples": [
+                "7f9c2b10-53a4-4f1b-9c8a-2a1e9f0c1234"
+              ],
+              "title": "Idempotency-Key"
+            },
+            "description": "UUID v4 duy nhất cho mỗi ý định thao tác ghi (Spec Mục 18)."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_RegisterSuccessData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Lỗi dữ liệu đầu vào hoặc thiếu Idempotency-Key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sai quyền, lệch student_id hoặc thiếu/sai queue token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Lớp học phần không tồn tại",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Hết chỗ, trùng đăng ký, đóng lớp, thiếu tiên quyết, trùng lịch hoặc đang xử lý",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sai Content-Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Tái sử dụng Idempotency-Key cho dữ liệu khác",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Hệ thống bận hoặc dịch vụ gián đoạn",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/registrations/{registration_id}": {
+      "delete": {
+        "tags": [
+          "Registrations"
+        ],
+        "summary": "Hủy đăng ký học phần và hoàn tiền mô phỏng nếu đã thanh toán",
+        "operationId": "cancel_registration_api_v1_registrations__registration_id__delete",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "registration_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "4d0ce29e-9e4d-4e0a-8a92-f776fe905001"
+              ],
+              "title": "Registration Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "UUID v4 duy nhất cho mỗi ý định thao tác ghi (Spec Mục 18).",
+              "examples": [
+                "7f9c2b10-53a4-4f1b-9c8a-2a1e9f0c1234"
+              ],
+              "title": "Idempotency-Key"
+            },
+            "description": "UUID v4 duy nhất cho mỗi ý định thao tác ghi (Spec Mục 18)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_CancelSuccessData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID sai định dạng hoặc thiếu Idempotency-Key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không phải tài khoản STUDENT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Đăng ký không tồn tại, không thuộc mình hoặc đã hủy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Cùng Idempotency-Key đang xử lý",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Tái sử dụng Idempotency-Key cho thao tác khác",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/registrations/me": {
+      "get": {
+        "tags": [
+          "Registrations"
+        ],
+        "summary": "Danh sách đăng ký và lịch sử đăng ký của sinh viên đang đăng nhập",
+        "operationId": "get_my_registrations_api_v1_registrations_me_get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": 20,
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ACTIVE | CANCELLED | ALL (mặc định ACTIVE)",
+              "default": "ACTIVE",
+              "title": "Status"
+            },
+            "description": "ACTIVE | CANCELLED | ALL (mặc định ACTIVE)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_MyRegistrationsData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tham số lọc hoặc phân trang không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không phải tài khoản STUDENT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payments": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Thanh toán học phí mô phỏng theo registration_id",
+        "operationId": "create_payment_api_v1_payments_post",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "UUID v4 duy nhất cho mỗi ý định thao tác ghi (Spec Mục 18).",
+              "examples": [
+                "7f9c2b10-53a4-4f1b-9c8a-2a1e9f0c1234"
+              ],
+              "title": "Idempotency-Key"
+            },
+            "description": "UUID v4 duy nhất cho mỗi ý định thao tác ghi (Spec Mục 18)."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_PaymentSuccessData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu sai hoặc thiếu Idempotency-Key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không phải tài khoản STUDENT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Đăng ký không tồn tại, không thuộc mình hoặc không còn ACTIVE",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Đã thanh toán (ALREADY_PAID) hoặc đang xử lý",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sai Content-Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Tái sử dụng Idempotency-Key cho dữ liệu khác",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Chức năng tắt hoặc hệ thống bận",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payments/me": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Lịch sử thanh toán và hoàn tiền mô phỏng của sinh viên",
+        "operationId": "get_my_payments_api_v1_payments_me_get",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": 20,
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "PAID | REFUNDED | ALL (mặc định ALL)",
+              "default": "ALL",
+              "title": "Status"
+            },
+            "description": "PAID | REFUNDED | ALL (mặc định ALL)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_MyPaymentsData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tham số phân trang hoặc trạng thái sai",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không phải tài khoản STUDENT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Chức năng thanh toán đang tắt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/course-classes": {
+      "post": {
+        "tags": [
+          "Admin Course Classes"
+        ],
+        "summary": "Tạo lớp học phần mới (ADMIN)",
+        "operationId": "admin_create_course_class_api_v1_admin_course_classes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCourseClassUpsertRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_CourseClassDetailData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu tạo lớp hoặc mã học phần không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không phải tài khoản ADMIN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Trùng class_code (CLASS_CODE_EXISTS)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sai Content-Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/course-classes/{course_class_id}": {
+      "put": {
+        "tags": [
+          "Admin Course Classes"
+        ],
+        "summary": "Cập nhật toàn bộ thông tin lớp học phần (ADMIN)",
+        "operationId": "admin_update_course_class_api_v1_admin_course_classes__course_class_id__put",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course_class_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "LHP001"
+              ],
+              "title": "Course Class Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCourseClassUpsertRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_CourseClassDetailData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu sửa lớp không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không phải tài khoản ADMIN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy lớp học phần",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CAPACITY_BELOW_REGISTERED, CLASS_HAS_REGISTRATIONS hoặc CLASS_CODE_EXISTS",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sai Content-Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/course-classes/{course_class_id}/status": {
+      "patch": {
+        "tags": [
+          "Admin Course Classes"
+        ],
+        "summary": "Mở hoặc đóng đăng ký cho lớp học phần (ADMIN)",
+        "operationId": "admin_patch_course_class_status_api_v1_admin_course_classes__course_class_id__status_patch",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course_class_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "LHP001"
+              ],
+              "title": "Course Class Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCourseClassStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_CourseClassDetailData_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu trạng thái không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không phải tài khoản ADMIN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy lớp học phần",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sai Content-Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/queue/join": {
+      "post": {
+        "tags": [
+          "Queue"
+        ],
+        "summary": "Tham gia hàng đợi đăng ký học phần FIFO",
+        "operationId": "join_queue_api_v1_queue_join_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueueJoinRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_QueueStateSchema_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Body phải là `{}`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không phải tài khoản STUDENT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sai Content-Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Redis lỗi khi hàng đợi đang bật",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/queue/status": {
+      "get": {
+        "tags": [
+          "Queue"
+        ],
+        "summary": "Kiểm tra vị trí chờ hoặc nhận token lượt đăng ký READY",
+        "operationId": "get_queue_status_api_v1_queue_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_QueueStateSchema_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tham số truy vấn không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Không phải tài khoản STUDENT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Redis lỗi khi hàng đợi đang bật",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Kiểm tra kết nối CSDL và trạng thái các tính năng bật",
+        "operationId": "health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSuccessEnvelope_HealthDataSchema_"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tham số truy vấn không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Cơ sở dữ liệu hoặc Redis (khi bật queue) không sẵn sàng",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdminCourseClassStatusRequest": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "CLOSED"
+            ],
+            "title": "Status",
+            "examples": [
+              "CLOSED"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "AdminCourseClassStatusRequest"
+      },
+      "AdminCourseClassUpsertRequest": {
+        "properties": {
+          "class_code": {
+            "type": "string",
+            "title": "Class Code",
+            "examples": [
+              "CNNT-01"
+            ]
+          },
+          "course_code": {
+            "type": "string",
+            "title": "Course Code",
+            "examples": [
+              "CNNT"
+            ]
+          },
+          "course_name": {
+            "type": "string",
+            "title": "Course Name",
+            "examples": [
+              "Công nghệ nền tảng"
+            ]
+          },
+          "credits": {
+            "type": "integer",
+            "maximum": 30.0,
+            "minimum": 1.0,
+            "title": "Credits",
+            "examples": [
+              3
+            ]
+          },
+          "capacity": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Capacity",
+            "examples": [
+              50
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "CLOSED"
+            ],
+            "title": "Status",
+            "examples": [
+              "OPEN"
+            ]
+          },
+          "schedule": {
+            "items": {
+              "$ref": "#/components/schemas/ScheduleItemSchema"
+            },
+            "type": "array",
+            "title": "Schedule",
+            "examples": [
+              []
+            ]
+          },
+          "prerequisite_course_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Prerequisite Course Codes",
+            "examples": [
+              []
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "class_code",
+          "course_code",
+          "course_name",
+          "credits",
+          "capacity",
+          "status",
+          "schedule",
+          "prerequisite_course_codes"
+        ],
+        "title": "AdminCourseClassUpsertRequest"
+      },
+      "ApiErrorEnvelope": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": false,
+            "examples": [
+              false
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "CLASS_FULL"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Lớp học phần đã hết chỗ."
+            ]
+          },
+          "data": {
+            "type": "null",
+            "title": "Data"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorDetailSchema"
+            },
+            "type": "array",
+            "title": "Errors"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "request_id"
+        ],
+        "title": "ApiErrorEnvelope"
+      },
+      "ApiSuccessEnvelope_AuthTokenData_": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true,
+            "examples": [
+              true
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "HEALTHY"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Thao tác thành công."
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/AuthTokenData"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data",
+          "request_id"
+        ],
+        "title": "ApiSuccessEnvelope[AuthTokenData]"
+      },
+      "ApiSuccessEnvelope_CancelSuccessData_": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true,
+            "examples": [
+              true
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "HEALTHY"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Thao tác thành công."
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/CancelSuccessData"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data",
+          "request_id"
+        ],
+        "title": "ApiSuccessEnvelope[CancelSuccessData]"
+      },
+      "ApiSuccessEnvelope_CourseClassDetailData_": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true,
+            "examples": [
+              true
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "HEALTHY"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Thao tác thành công."
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/CourseClassDetailData"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data",
+          "request_id"
+        ],
+        "title": "ApiSuccessEnvelope[CourseClassDetailData]"
+      },
+      "ApiSuccessEnvelope_CourseClassListData_": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true,
+            "examples": [
+              true
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "HEALTHY"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Thao tác thành công."
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/CourseClassListData"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data",
+          "request_id"
+        ],
+        "title": "ApiSuccessEnvelope[CourseClassListData]"
+      },
+      "ApiSuccessEnvelope_HealthDataSchema_": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true,
+            "examples": [
+              true
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "HEALTHY"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Thao tác thành công."
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/HealthDataSchema"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data",
+          "request_id"
+        ],
+        "title": "ApiSuccessEnvelope[HealthDataSchema]"
+      },
+      "ApiSuccessEnvelope_LogoutData_": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true,
+            "examples": [
+              true
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "HEALTHY"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Thao tác thành công."
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/LogoutData"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data",
+          "request_id"
+        ],
+        "title": "ApiSuccessEnvelope[LogoutData]"
+      },
+      "ApiSuccessEnvelope_MyPaymentsData_": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true,
+            "examples": [
+              true
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "HEALTHY"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Thao tác thành công."
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/MyPaymentsData"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data",
+          "request_id"
+        ],
+        "title": "ApiSuccessEnvelope[MyPaymentsData]"
+      },
+      "ApiSuccessEnvelope_MyRegistrationsData_": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true,
+            "examples": [
+              true
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "HEALTHY"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Thao tác thành công."
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/MyRegistrationsData"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data",
+          "request_id"
+        ],
+        "title": "ApiSuccessEnvelope[MyRegistrationsData]"
+      },
+      "ApiSuccessEnvelope_PaymentSuccessData_": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true,
+            "examples": [
+              true
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "HEALTHY"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Thao tác thành công."
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/PaymentSuccessData"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data",
+          "request_id"
+        ],
+        "title": "ApiSuccessEnvelope[PaymentSuccessData]"
+      },
+      "ApiSuccessEnvelope_QueueStateSchema_": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true,
+            "examples": [
+              true
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "HEALTHY"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Thao tác thành công."
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/QueueStateSchema"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data",
+          "request_id"
+        ],
+        "title": "ApiSuccessEnvelope[QueueStateSchema]"
+      },
+      "ApiSuccessEnvelope_RegisterSuccessData_": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true,
+            "examples": [
+              true
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "HEALTHY"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Thao tác thành công."
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/RegisterSuccessData"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "data",
+          "request_id"
+        ],
+        "title": "ApiSuccessEnvelope[RegisterSuccessData]"
+      },
+      "AuthTokenData": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token",
+            "examples": [
+              "ACCESS_TOKEN_SAMPLE"
+            ]
+          },
+          "token_type": {
+            "type": "string",
+            "const": "Bearer",
+            "title": "Token Type",
+            "default": "Bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expires In",
+            "examples": [
+              3600
+            ]
+          },
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token",
+            "examples": [
+              "REFRESH_TOKEN_SAMPLE"
+            ]
+          },
+          "refresh_expires_in": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Refresh Expires In",
+            "examples": [
+              28800
+            ]
+          },
+          "student": {
+            "$ref": "#/components/schemas/StudentSchema"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "access_token",
+          "expires_in",
+          "refresh_token",
+          "refresh_expires_in",
+          "student"
+        ],
+        "title": "AuthTokenData"
+      },
+      "CancelSuccessData": {
+        "properties": {
+          "registration": {
+            "$ref": "#/components/schemas/RegistrationSchema"
+          },
+          "course_class": {
+            "$ref": "#/components/schemas/CourseClassSchema"
+          },
+          "refund": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RefundInfoSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registration",
+          "course_class"
+        ],
+        "title": "CancelSuccessData"
+      },
+      "CourseClassDetailData": {
+        "properties": {
+          "course_class": {
+            "$ref": "#/components/schemas/CourseClassSchema"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "course_class"
+        ],
+        "title": "CourseClassDetailData"
+      },
+      "CourseClassListData": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CourseClassSchema"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationSchema"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "pagination"
+        ],
+        "title": "CourseClassListData"
+      },
+      "CourseClassSchema": {
+        "properties": {
+          "course_class_id": {
+            "type": "string",
+            "title": "Course Class Id",
+            "examples": [
+              "LHP001"
+            ]
+          },
+          "class_code": {
+            "type": "string",
+            "title": "Class Code",
+            "examples": [
+              "CNNT-01"
+            ]
+          },
+          "course_code": {
+            "type": "string",
+            "title": "Course Code",
+            "examples": [
+              "CNNT"
+            ]
+          },
+          "course_name": {
+            "type": "string",
+            "title": "Course Name",
+            "examples": [
+              "Công nghệ nền tảng"
+            ]
+          },
+          "credits": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Credits",
+            "examples": [
+              3
+            ]
+          },
+          "capacity": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Capacity",
+            "examples": [
+              50
+            ]
+          },
+          "remaining_seats": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Remaining Seats",
+            "examples": [
+              50
+            ]
+          },
+          "registered_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Registered Count",
+            "examples": [
+              0
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "CLOSED"
+            ],
+            "title": "Status",
+            "examples": [
+              "OPEN"
+            ]
+          },
+          "schedule": {
+            "items": {
+              "$ref": "#/components/schemas/ScheduleItemSchema"
+            },
+            "type": "array",
+            "title": "Schedule"
+          },
+          "prerequisites": {
+            "items": {
+              "$ref": "#/components/schemas/PrerequisiteItemSchema"
+            },
+            "type": "array",
+            "title": "Prerequisites"
+          },
+          "tuition_amount": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Tuition Amount",
+            "examples": [
+              1500000
+            ]
+          },
+          "registration_status": {
+            "type": "string",
+            "enum": [
+              "REGISTERED",
+              "NOT_REGISTERED"
+            ],
+            "title": "Registration Status",
+            "examples": [
+              "NOT_REGISTERED"
+            ]
+          },
+          "registration_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registration Id",
+            "examples": [
+              null
+            ]
+          },
+          "payment_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "UNPAID",
+                  "PAID"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Status",
+            "examples": [
+              null
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "course_class_id",
+          "class_code",
+          "course_code",
+          "course_name",
+          "credits",
+          "capacity",
+          "remaining_seats",
+          "registered_count",
+          "status",
+          "tuition_amount",
+          "registration_status"
+        ],
+        "title": "CourseClassSchema"
+      },
+      "ErrorDetailSchema": {
+        "properties": {
+          "field": {
+            "type": "string",
+            "title": "Field",
+            "examples": [
+              "course_class_id"
+            ]
+          },
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "REQUIRED"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "Trường 'course_class_id' là bắt buộc."
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "field",
+          "code",
+          "message"
+        ],
+        "title": "ErrorDetailSchema"
+      },
+      "HealthDataSchema": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "UP",
+            "title": "Status",
+            "default": "UP"
+          },
+          "database": {
+            "type": "string",
+            "const": "UP",
+            "title": "Database",
+            "default": "UP"
+          },
+          "api_version": {
+            "type": "string",
+            "title": "Api Version",
+            "default": "1.0.0",
+            "examples": [
+              "1.0.0"
+            ]
+          },
+          "features": {
+            "$ref": "#/components/schemas/HealthFeaturesSchema"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "features"
+        ],
+        "title": "HealthDataSchema"
+      },
+      "HealthFeaturesSchema": {
+        "properties": {
+          "payments": {
+            "type": "boolean",
+            "title": "Payments",
+            "examples": [
+              true
+            ]
+          },
+          "sso": {
+            "type": "boolean",
+            "title": "Sso",
+            "examples": [
+              false
+            ]
+          },
+          "queue": {
+            "type": "boolean",
+            "title": "Queue",
+            "examples": [
+              false
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "payments",
+          "sso",
+          "queue"
+        ],
+        "title": "HealthFeaturesSchema"
+      },
+      "LoginRequest": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "title": "Student Id",
+            "examples": [
+              "SV0001"
+            ]
+          },
+          "password": {
+            "type": "string",
+            "title": "Password",
+            "examples": [
+              "Demo@123456"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "student_id",
+          "password"
+        ],
+        "title": "LoginRequest"
+      },
+      "LogoutData": {
+        "properties": {
+          "logged_out": {
+            "type": "boolean",
+            "title": "Logged Out",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "LogoutData"
+      },
+      "LogoutRequest": {
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token",
+            "examples": [
+              "REFRESH_TOKEN_SAMPLE"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "refresh_token"
+        ],
+        "title": "LogoutRequest"
+      },
+      "MyPaymentsData": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PaymentSchema"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationSchema"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "pagination"
+        ],
+        "title": "MyPaymentsData"
+      },
+      "MyRegistrationsData": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "title": "Student Id",
+            "examples": [
+              "SV0001"
+            ]
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RegistrationSchema"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationSchema"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "student_id",
+          "items",
+          "pagination"
+        ],
+        "title": "MyRegistrationsData"
+      },
+      "PaginationSchema": {
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Page",
+            "examples": [
+              1
+            ]
+          },
+          "page_size": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Page Size",
+            "examples": [
+              20
+            ]
+          },
+          "total_items": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Items",
+            "examples": [
+              1
+            ]
+          },
+          "total_pages": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Pages",
+            "examples": [
+              1
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "page",
+          "page_size",
+          "total_items",
+          "total_pages"
+        ],
+        "title": "PaginationSchema"
+      },
+      "PaymentCreateRequest": {
+        "properties": {
+          "registration_id": {
+            "type": "string",
+            "title": "Registration Id",
+            "examples": [
+              "4d0ce29e-9e4d-4e0a-8a92-f776fe905001"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registration_id"
+        ],
+        "title": "PaymentCreateRequest"
+      },
+      "PaymentSchema": {
+        "properties": {
+          "payment_id": {
+            "type": "string",
+            "title": "Payment Id",
+            "examples": [
+              "61de10f7-8f5e-4d34-a3cd-0dcb5da42519"
+            ]
+          },
+          "registration_id": {
+            "type": "string",
+            "title": "Registration Id",
+            "examples": [
+              "4d0ce29e-9e4d-4e0a-8a92-f776fe905001"
+            ]
+          },
+          "course_class_id": {
+            "type": "string",
+            "title": "Course Class Id",
+            "examples": [
+              "LHP001"
+            ]
+          },
+          "class_code": {
+            "type": "string",
+            "title": "Class Code",
+            "examples": [
+              "CNNT-01"
+            ]
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Amount",
+            "examples": [
+              1500000
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "const": "VND",
+            "title": "Currency",
+            "default": "VND"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PAID",
+              "REFUNDED"
+            ],
+            "title": "Status",
+            "examples": [
+              "PAID"
+            ]
+          },
+          "paid_at": {
+            "type": "string",
+            "title": "Paid At",
+            "examples": [
+              "2026-11-01T08:35:00Z"
+            ]
+          },
+          "refunded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refunded At",
+            "examples": [
+              null
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "payment_id",
+          "registration_id",
+          "course_class_id",
+          "class_code",
+          "amount",
+          "status",
+          "paid_at"
+        ],
+        "title": "PaymentSchema"
+      },
+      "PaymentSuccessData": {
+        "properties": {
+          "payment": {
+            "$ref": "#/components/schemas/PaymentSchema"
+          },
+          "registration": {
+            "$ref": "#/components/schemas/RegistrationSchema"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "payment",
+          "registration"
+        ],
+        "title": "PaymentSuccessData"
+      },
+      "PrerequisiteItemSchema": {
+        "properties": {
+          "course_code": {
+            "type": "string",
+            "title": "Course Code",
+            "examples": [
+              "CS101"
+            ]
+          },
+          "course_name": {
+            "type": "string",
+            "title": "Course Name",
+            "examples": [
+              "Nhập môn lập trình"
+            ]
+          },
+          "satisfied": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Satisfied",
+            "examples": [
+              false
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "course_code",
+          "course_name"
+        ],
+        "title": "PrerequisiteItemSchema"
+      },
+      "QueueJoinRequest": {
+        "properties": {},
+        "additionalProperties": false,
+        "type": "object",
+        "title": "QueueJoinRequest",
+        "description": "Empty JSON object `{}` required by Spec Section 16; unknown fields rejected."
+      },
+      "QueueStateSchema": {
+        "properties": {
+          "queue_enabled": {
+            "type": "boolean",
+            "title": "Queue Enabled",
+            "examples": [
+              true
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "WAITING",
+              "READY",
+              "EXPIRED"
+            ],
+            "title": "Status",
+            "examples": [
+              "WAITING"
+            ]
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position",
+            "examples": [
+              3
+            ]
+          },
+          "estimated_wait_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Wait Seconds",
+            "examples": [
+              null
+            ]
+          },
+          "ready_expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ready Expires At",
+            "examples": [
+              null
+            ]
+          },
+          "queue_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Queue Token",
+            "examples": [
+              null
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "queue_enabled",
+          "status"
+        ],
+        "title": "QueueStateSchema"
+      },
+      "RefreshRequest": {
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token",
+            "examples": [
+              "REFRESH_TOKEN_SAMPLE"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "refresh_token"
+        ],
+        "title": "RefreshRequest"
+      },
+      "RefundInfoSchema": {
+        "properties": {
+          "payment_id": {
+            "type": "string",
+            "title": "Payment Id",
+            "examples": [
+              "61de10f7-8f5e-4d34-a3cd-0dcb5da42519"
+            ]
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Amount",
+            "examples": [
+              1500000
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "const": "VND",
+            "title": "Currency",
+            "default": "VND"
+          },
+          "status": {
+            "type": "string",
+            "const": "REFUNDED",
+            "title": "Status",
+            "default": "REFUNDED"
+          },
+          "refunded_at": {
+            "type": "string",
+            "title": "Refunded At",
+            "examples": [
+              "2026-11-01T08:40:00Z"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "payment_id",
+          "amount",
+          "refunded_at"
+        ],
+        "title": "RefundInfoSchema"
+      },
+      "RegisterRequest": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "title": "Student Id",
+            "examples": [
+              "SV0001"
+            ]
+          },
+          "course_class_id": {
+            "type": "string",
+            "title": "Course Class Id",
+            "examples": [
+              "LHP001"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "student_id",
+          "course_class_id"
+        ],
+        "title": "RegisterRequest"
+      },
+      "RegisterSuccessData": {
+        "properties": {
+          "registration": {
+            "$ref": "#/components/schemas/RegistrationSchema"
+          },
+          "course_class": {
+            "$ref": "#/components/schemas/CourseClassSchema"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registration",
+          "course_class"
+        ],
+        "title": "RegisterSuccessData"
+      },
+      "RegistrationSchema": {
+        "properties": {
+          "registration_id": {
+            "type": "string",
+            "title": "Registration Id",
+            "examples": [
+              "4d0ce29e-9e4d-4e0a-8a92-f776fe905001"
+            ]
+          },
+          "student_id": {
+            "type": "string",
+            "title": "Student Id",
+            "examples": [
+              "SV0001"
+            ]
+          },
+          "course_class_id": {
+            "type": "string",
+            "title": "Course Class Id",
+            "examples": [
+              "LHP001"
+            ]
+          },
+          "class_code": {
+            "type": "string",
+            "title": "Class Code",
+            "examples": [
+              "CNNT-01"
+            ]
+          },
+          "course_name": {
+            "type": "string",
+            "title": "Course Name",
+            "examples": [
+              "Công nghệ nền tảng"
+            ]
+          },
+          "credits": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Credits",
+            "examples": [
+              3
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "CANCELLED"
+            ],
+            "title": "Status",
+            "examples": [
+              "ACTIVE"
+            ]
+          },
+          "payment_status": {
+            "type": "string",
+            "enum": [
+              "UNPAID",
+              "PAID",
+              "REFUNDED"
+            ],
+            "title": "Payment Status",
+            "examples": [
+              "UNPAID"
+            ]
+          },
+          "tuition_amount": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Tuition Amount",
+            "examples": [
+              1500000
+            ]
+          },
+          "registered_at": {
+            "type": "string",
+            "title": "Registered At",
+            "examples": [
+              "2026-11-01T08:30:00Z"
+            ]
+          },
+          "cancelled_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelled At",
+            "examples": [
+              null
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registration_id",
+          "student_id",
+          "course_class_id",
+          "class_code",
+          "course_name",
+          "credits",
+          "status",
+          "payment_status",
+          "tuition_amount",
+          "registered_at"
+        ],
+        "title": "RegistrationSchema"
+      },
+      "ScheduleItemSchema": {
+        "properties": {
+          "day_of_week": {
+            "type": "string",
+            "enum": [
+              "MON",
+              "TUE",
+              "WED",
+              "THU",
+              "FRI",
+              "SAT",
+              "SUN"
+            ],
+            "title": "Day Of Week",
+            "examples": [
+              "MON"
+            ]
+          },
+          "start_period": {
+            "type": "integer",
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "Start Period",
+            "examples": [
+              1
+            ]
+          },
+          "end_period": {
+            "type": "integer",
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "End Period",
+            "examples": [
+              3
+            ]
+          },
+          "room": {
+            "type": "string",
+            "title": "Room",
+            "examples": [
+              "A101"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "day_of_week",
+          "start_period",
+          "end_period",
+          "room"
+        ],
+        "title": "ScheduleItemSchema"
+      },
+      "SsoExchangeRequest": {
+        "properties": {
+          "exchange_code": {
+            "type": "string",
+            "title": "Exchange Code",
+            "examples": [
+              "ONE_TIME_CODE_SAMPLE"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "exchange_code"
+        ],
+        "title": "SsoExchangeRequest"
+      },
+      "StudentSchema": {
+        "properties": {
+          "student_id": {
+            "type": "string",
+            "title": "Student Id",
+            "examples": [
+              "SV0001"
+            ]
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name",
+            "examples": [
+              "Sinh viên mẫu 0001"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "STUDENT",
+              "ADMIN"
+            ],
+            "title": "Role",
+            "examples": [
+              "STUDENT"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "student_id",
+          "full_name",
+          "role"
+        ],
+        "title": "StudentSchema"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "description": "Opaque access token cấp từ `/api/v1/auth/login` hoặc `/api/v1/auth/sso/exchange`.",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

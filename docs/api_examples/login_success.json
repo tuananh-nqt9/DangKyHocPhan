@@ -1,0 +1,18 @@
+{
+  "success": true,
+  "code": "LOGIN_SUCCESS",
+  "message": "Đăng nhập thành công.",
+  "data": {
+    "access_token": "SAMPLE_ONLY_DO_NOT_USE_ACCESS_TOKEN",
+    "token_type": "Bearer",
+    "expires_in": 3600,
+    "refresh_token": "SAMPLE_ONLY_DO_NOT_USE_REFRESH_TOKEN",
+    "refresh_expires_in": 28800,
+    "student": {
+      "student_id": "SV0001",
+      "full_name": "Sinh viên mẫu 0001",
+      "role": "STUDENT"
+    }
+  },
+  "request_id": "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+}

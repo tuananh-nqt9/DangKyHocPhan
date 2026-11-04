@@ -1,0 +1,58 @@
+{
+  "disabled": {
+    "success": true,
+    "code": "QUEUE_STATUS_FETCHED",
+    "message": "Lấy trạng thái hàng đợi thành công.",
+    "data": {
+      "queue_enabled": false,
+      "status": "NONE",
+      "position": null,
+      "estimated_wait_seconds": null,
+      "ready_expires_at": null,
+      "queue_token": null
+    },
+    "request_id": "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+  },
+  "waiting": {
+    "success": true,
+    "code": "QUEUE_JOINED",
+    "message": "Tham gia hàng đợi thành công.",
+    "data": {
+      "queue_enabled": true,
+      "status": "WAITING",
+      "position": 3,
+      "estimated_wait_seconds": null,
+      "ready_expires_at": null,
+      "queue_token": null
+    },
+    "request_id": "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+  },
+  "ready": {
+    "success": true,
+    "code": "QUEUE_STATUS_FETCHED",
+    "message": "Lấy trạng thái hàng đợi thành công.",
+    "data": {
+      "queue_enabled": true,
+      "status": "READY",
+      "position": null,
+      "estimated_wait_seconds": null,
+      "ready_expires_at": "2026-11-01T08:35:00Z",
+      "queue_token": "SAMPLE_ONLY_DO_NOT_USE_QUEUE_TOKEN"
+    },
+    "request_id": "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+  },
+  "expired": {
+    "success": true,
+    "code": "QUEUE_STATUS_FETCHED",
+    "message": "Lấy trạng thái hàng đợi thành công.",
+    "data": {
+      "queue_enabled": true,
+      "status": "EXPIRED",
+      "position": null,
+      "estimated_wait_seconds": null,
+      "ready_expires_at": null,
+      "queue_token": null
+    },
+    "request_id": "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+  }
+}

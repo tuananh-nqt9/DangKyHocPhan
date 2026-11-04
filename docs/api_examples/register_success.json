@@ -1,0 +1,51 @@
+{
+  "success": true,
+  "code": "REGISTERED",
+  "message": "Đăng ký học phần thành công.",
+  "data": {
+    "registration": {
+      "registration_id": "4d0ce29e-9e4d-4e0a-8a92-f776fe905001",
+      "student_id": "SV0001",
+      "course_class_id": "LHP001",
+      "class_code": "CNNT-01",
+      "course_name": "Công nghệ nền tảng",
+      "credits": 3,
+      "status": "ACTIVE",
+      "payment_status": "UNPAID",
+      "tuition_amount": 1500000,
+      "registered_at": "2026-11-01T08:30:00Z",
+      "cancelled_at": null
+    },
+    "course_class": {
+      "course_class_id": "LHP001",
+      "class_code": "CNNT-01",
+      "course_code": "CNNT",
+      "course_name": "Công nghệ nền tảng",
+      "credits": 3,
+      "capacity": 50,
+      "remaining_seats": 49,
+      "registered_count": 1,
+      "status": "OPEN",
+      "schedule": [
+        {
+          "day_of_week": "MON",
+          "start_period": 1,
+          "end_period": 3,
+          "room": "A101"
+        }
+      ],
+      "prerequisites": [
+        {
+          "course_code": "CS101",
+          "course_name": "Nhập môn lập trình",
+          "satisfied": true
+        }
+      ],
+      "tuition_amount": 1500000,
+      "registration_status": "REGISTERED",
+      "registration_id": "4d0ce29e-9e4d-4e0a-8a92-f776fe905001",
+      "payment_status": "UNPAID"
+    }
+  },
+  "request_id": "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+}

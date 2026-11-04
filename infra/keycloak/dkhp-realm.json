@@ -1,0 +1,53 @@
+{
+  "realm": "dkhp",
+  "enabled": true,
+  "displayName": "DKHP Lab OIDC Realm",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "clients": [
+    {
+      "clientId": "dkhp-backend",
+      "name": "DKHP Backend Confidential Client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "dev-only-keycloak-secret-override-in-env",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:8080/api/v1/auth/sso/callback",
+        "http://127.0.0.1:8080/api/v1/auth/sso/callback"
+      ],
+      "webOrigins": [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    }
+  ],
+  "users": [
+    {
+      "id": "11111111-2222-3333-4444-555555550001",
+      "username": "sv0001",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Sinh viên mẫu",
+      "lastName": "0001",
+      "email": "sv0001@lab.dkhp.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Demo@123456",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

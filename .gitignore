@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+ENV/
+
+# Testing & linting caches
+.pytest_cache/
+.pytest_tmp/
+backend/.pytest_tmp/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment & secrets (NEVER commit real secrets or exported tokens)
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Lab token exports, load-test artifacts & DB backups
+artifacts/
+exports/
+tokens/
+*.tokens.json
+*.tokens.csv
+*.dump
+*.sql.gz
+*.bak
+.pgdata/
+
+# OS / IDE
+.DS_Store
+Thumbsumbs.db
+.vscode/
+.idea/
+
+# Project specific
+outputs/

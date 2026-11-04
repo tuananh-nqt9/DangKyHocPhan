@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "code": "COURSE_CLASSES_FETCHED",
+  "message": "Lấy danh sách lớp học phần thành công.",
+  "data": {
+    "items": [],
+    "pagination": {
+      "page": 1,
+      "page_size": 20,
+      "total_items": 0,
+      "total_pages": 0
+    }
+  },
+  "request_id": "8c6c3ed0-768d-4fc6-8792-7b7eae691501"
+}
