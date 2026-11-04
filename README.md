@@ -1,10 +1,8 @@
-# Hệ thống Đăng ký Học phần Trực tuyến — Backend & Cơ sở Dữ liệu (TV2)
+# Hệ thống Đăng ký Học phần Trực tuyến — Backend & Cơ sở Dữ liệu 
 
 - **Môn học**: Nhập môn Công nghệ Nền tảng
 - **Đề tài 08**: Thiết kế hệ thống đăng ký học phần trực tuyến (quy mô 3.000 sinh viên, tập trung xử lý tranh chấp tại thời điểm mở đăng ký)
-- **Phạm vi kho mã**: Thành viên 2 (TV2) — Cơ sở dữ liệu PostgreSQL 16, Backend API FastAPI, xác thực/phân quyền, giao dịch & khóa đồng thời, Idempotency-Key, thanh toán/hoàn tiền mô phỏng nội bộ, hàng đợi Redis (Lua), SSO Keycloak OIDC + PKCE, bộ kiểm thử tự động (`TC01–TC25`) và tài liệu bàn giao cho TV1/TV3.
-- **Hợp đồng API áp dụng**: Đặc tả API Hoàn chỉnh TV2–TV3 **v3.0** (`API version 1.0.0`, tiền tố `/api/v1`).
-
+- **Phạm vi**: Cơ sở dữ liệu PostgreSQL 16, Backend API FastAPI, xác thực/phân quyền, giao dịch & khóa đồng thời, Idempotency-Key, thanh toán/hoàn tiền mô phỏng nội bộ, hàng đợi Redis (Lua), SSO Keycloak OIDC + PKCE, bộ kiểm thử tự động (`TC01–TC25`) và tài liệu.
 > **Lưu ý quan trọng về phạm vi mô phỏng & bảo mật phòng lab**:
 > 1. Thanh toán (`POST /api/v1/payments`) và hoàn tiền khi hủy lớp **chỉ là mô phỏng nội bộ trên PostgreSQL** để kiểm chứng giao dịch nguyên tử; hệ thống **không** kết nối ngân hàng, SePay hay VietQR thật.
 > 2. Mật khẩu mẫu `Demo@123456` của các tài khoản seed (`SV0001`..`SV3000`, `AD0001`) và client secret mẫu trong `compose.dev.yml` **chỉ phục vụ môi trường phát triển / phòng lab**, tuyệt đối không dùng cho môi trường thật.
