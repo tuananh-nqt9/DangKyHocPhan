@@ -17,7 +17,7 @@ export default function RegistrationConfirmModal({ courses, loading, queueEnable
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-gray-950/40 p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-60 flex items-end justify-center bg-gray-950/40 p-0 sm:items-center sm:p-4"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !loading) onClose();
       }}

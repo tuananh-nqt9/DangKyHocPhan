@@ -155,7 +155,7 @@ export default function MyCourses() {
         ) : (
           <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] table-fixed border-collapse text-sm">
+              <table className="w-full min-w-225 table-fixed border-collapse text-sm">
                 <thead className="bg-gray-50 text-xs font-semibold text-gray-700">
                   <tr>
                     <th scope="col" className="w-14 border-b border-r border-gray-200 px-3 py-3 text-center">TT</th>

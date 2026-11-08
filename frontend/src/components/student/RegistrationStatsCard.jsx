@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function RegistrationStatsCard({ count, loading, error, onRetry }) {
   return (
-    <section className="flex h-full min-h-[320px] flex-col rounded-2xl border border-gray-200 bg-white p-7 shadow-sm sm:p-8">
+    <section className="flex h-full min-h-80 flex-col rounded-2xl border border-gray-200 bg-white p-7 shadow-sm sm:p-8">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-base font-semibold text-gray-900">Học phần đã đăng ký</h2>
@@ -35,7 +35,7 @@ export default function RegistrationStatsCard({ count, loading, error, onRetry }
         <div className="mt-10">
           <p className="text-5xl font-bold tracking-tight text-gray-900">{count}</p>
           <p className="mt-3 text-sm text-gray-500">
-            {count === 0 ? 'Bạn chưa đăng ký học phần nào.' : 'học phần đang hoạt động'}
+            {count === 0 ? 'Bạn chưa đăng ký học phần nào.' : 'học phần'}
           </p>
         </div>
       )}

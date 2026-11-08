@@ -30,7 +30,7 @@ export default function RegistrationResult({
     <aside
       role={notificationType === 'error' ? 'alert' : 'status'}
       aria-label="Thông báo đăng ký học phần"
-      className="fixed right-4 top-4 z-[100] w-[calc(100vw-2rem)] max-w-md"
+      className="fixed right-4 top-4 z-100 w-[calc(100vw-2rem)] max-w-md"
     >
       <section
         className={`overflow-hidden rounded-xl border bg-white shadow-xl ${
