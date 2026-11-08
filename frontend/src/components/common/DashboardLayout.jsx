@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GraduationCap, LogOut, ShieldCheck } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { clearAuthData, getCurrentUser, logout } from '../../services/authService.js';
+import ptitLogo from '../../assets/ptitlogo.png';
 
 export default function DashboardLayout({ role }) {
   const navigate = useNavigate();
@@ -36,9 +37,11 @@ export default function DashboardLayout({ role }) {
       <header className="border-b border-red-100 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white">
-              {isAdmin ? <ShieldCheck className="h-5 w-5" /> : <GraduationCap className="h-6 w-6" />}
-            </div>
+            <img
+              src={ptitLogo}
+              alt="Logo PTIT"
+              className="h-12 w-12 rounded-xl border border-red-100 bg-white object-contain"
+            />
             <div>
               <p className="font-semibold text-gray-900">Đăng ký Học phần PTIT</p>
               <p className="text-xs text-gray-500">{isAdmin ? 'Cổng quản trị viên' : 'Cổng sinh viên'}</p>

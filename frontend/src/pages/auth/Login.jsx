@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GraduationCap, Lock, User, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
 import { login, saveAuthData } from '../../services/authService';
+import ptitLogo from '../../assets/ptitlogo.png';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -83,7 +84,7 @@ export default function Login() {
   const ssoAuthUrl = import.meta.env.VITE_SSO_AUTH_URL;
 
   return (
-    <main className="relative min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 flex items-center justify-center px-4 py-8">
+    <main className="relative min-h-screen bg-linear-to-br from-primary-50 via-white to-primary-100 flex items-center justify-center px-4 py-8">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-200/30 rounded-full blur-3xl" />
@@ -93,9 +94,11 @@ export default function Login() {
       <div className="relative w-full max-w-md">
         {/* Logo / Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-2xl shadow-lg shadow-primary-500/30 mb-4">
-            <GraduationCap className="w-9 h-9 text-white" />
-          </div>
+          <img
+            src={ptitLogo}
+            alt="Logo PTIT"
+            className="mx-auto mb-4 h-20 w-20 rounded-2xl border border-red-100 bg-white object-contain shadow-lg shadow-primary-500/10"
+          />
           <h1 className="text-2xl font-bold text-gray-900">Đăng ký Học phần PTIT</h1>
           <p className="text-gray-500 mt-1 text-sm">Đăng nhập để tiếp tục đăng ký học phần</p>
         </div>
@@ -261,7 +264,7 @@ export default function Login() {
                     fill="#EA4335"
                   />
                 </svg>
-                Đăng nhập bằng SSO (Google)
+                Đăng nhập bằng Google
               </a>
             </>
           )}
