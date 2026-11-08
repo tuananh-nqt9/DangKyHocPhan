@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from '../pages/auth/Login.jsx';
 import AdminDashboard from '../pages/admin/Dashboard.jsx';
 import StudentDashboard from '../pages/student/Dashboard.jsx';
+import StudentRegistration from '../pages/student/Registration.jsx';
 import { getUserRole, isAuthenticated } from '../services/authService.js';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import RoleRoute from './RoleRoute.jsx';
@@ -33,6 +34,16 @@ export default function AppRoutes() {
           <ProtectedRoute>
             <RoleRoute role="STUDENT">
               <StudentDashboard />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/registration"
+        element={
+          <ProtectedRoute>
+            <RoleRoute role="STUDENT">
+              <StudentRegistration />
             </RoleRoute>
           </ProtectedRoute>
         }

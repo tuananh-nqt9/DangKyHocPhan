@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { ChevronDown, LogOut } from 'lucide-react';
 import { clearAuthData, getCurrentUser, logout } from '../../services/authService.js';
 import ptitLogo from '../../assets/ptitlogo.png';
 
-export default function DashboardLayout({ role }) {
+export default function DashboardLayout({ role, pageTitle, children }) {
   const navigate = useNavigate();
   const user = getCurrentUser();
   const [loggingOut, setLoggingOut] = useState(false);
   const [error, setError] = useState('');
   const isAdmin = role === 'ADMIN';
+  const title = pageTitle || (isAdmin ? 'Trang quản trị' : 'Trang chủ sinh viên');
+  const displayName = user?.full_name || user?.student_id || '';
+  const avatarInitial = (displayName.trim().charAt(0) || '?').toLocaleUpperCase('vi');
 
   const handleLogout = async () => {
     setError('');
@@ -34,28 +37,49 @@ export default function DashboardLayout({ role }) {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <header className="border-b border-red-100 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
+      <header className="border-b border-gray-200 bg-white">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
             <img
               src={ptitLogo}
               alt="Logo PTIT"
               className="h-12 w-12 rounded-xl border border-red-100 bg-white object-contain"
             />
-            <div>
+            <div className="min-w-0">
               <p className="font-semibold text-gray-900">Đăng ký Học phần PTIT</p>
               <p className="text-xs text-gray-500">{isAdmin ? 'Cổng quản trị viên' : 'Cổng sinh viên'}</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            disabled={loggingOut}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition hover:border-red-200 hover:bg-red-50 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <LogOut className="h-4 w-4" />
-            {loggingOut ? 'Đang đăng xuất...' : 'Đăng xuất'}
-          </button>
+          {isAdmin && (
+            <h1 className="mr-auto text-base font-semibold text-gray-900">{title}</h1>
+          )}
+          <details className="group relative">
+            <summary className="flex cursor-pointer list-none items-center gap-2 rounded-xl p-1.5 outline-none hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-red-600">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-red-50 text-sm font-semibold text-red-700">
+                {avatarInitial}
+              </span>
+              <span className="hidden max-w-36 truncate text-sm font-medium text-gray-700 sm:block">
+                {displayName}
+              </span>
+              <ChevronDown className="h-4 w-4 text-gray-400" aria-hidden="true" />
+              <span className="sr-only">Mở menu tài khoản</span>
+            </summary>
+            <div className="absolute right-0 z-10 mt-2 w-64 rounded-xl border border-gray-200 bg-white p-3 shadow-lg">
+              <p className="truncate text-sm font-semibold text-gray-900">{displayName}</p>
+              <p className="mt-1 text-xs text-gray-500">{user?.student_id}</p>
+              <p className="mt-1 text-xs text-gray-500">{isAdmin ? 'Quản trị viên' : 'Sinh viên'}</p>
+              <div className="my-3 border-t border-gray-100" />
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-gray-700 transition hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                {loggingOut ? 'Đang đăng xuất...' : 'Đăng xuất'}
+              </button>
+            </div>
+          </details>
         </div>
       </header>
 
@@ -65,23 +89,21 @@ export default function DashboardLayout({ role }) {
             {error}
           </div>
         )}
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-sm font-medium text-primary-700">
-            {isAdmin ? 'Khu vực quản trị' : 'Khu vực sinh viên'}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-gray-900">
-            Xin chào, {user?.full_name || user?.student_id}
-          </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            {isAdmin
-              ? 'Bạn đã đăng nhập với quyền quản trị viên.'
-              : 'Bạn đã đăng nhập thành công. Chào mừng bạn đến với hệ thống đăng ký học phần.'}
-          </p>
-          <div className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
-            <span className="font-medium">Mã tài khoản:</span>
-            <span>{user?.student_id}</span>
+        {children || (
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+            <p className="text-sm font-medium text-red-700">Khu vực quản trị</p>
+            <h2 className="mt-2 text-2xl font-bold text-gray-900">
+              Xin chào, {displayName}
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Bạn đã đăng nhập với quyền quản trị viên.
+            </p>
+            <div className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
+              <span className="font-medium">Mã tài khoản:</span>
+              <span>{user?.student_id}</span>
+            </div>
           </div>
-        </div>
+        )}
       </section>
     </main>
   );
