@@ -4,15 +4,12 @@ import { Link } from 'react-router-dom';
 export default function RegistrationShortcut() {
   return (
     <section className="flex flex-col gap-6 rounded-2xl border border-red-100 bg-white p-7 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-8">
-      <div className="flex items-start gap-4">
+      <div className="flex items-center gap-4">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
           <BookOpenCheck className="h-6 w-6" aria-hidden="true" />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Đăng ký học phần</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-            Khám phá các lớp học phần và đăng ký môn học cho kỳ học của bạn.
-          </p>
+          <h2 className="text-lg font-semibold leading-none text-gray-900">Đăng ký học phần</h2>
         </div>
       </div>
       <Link

@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from '../pages/auth/Login.jsx';
 import AdminDashboard from '../pages/admin/Dashboard.jsx';
 import StudentDashboard from '../pages/student/Dashboard.jsx';
+import MyCourses from '../pages/student/MyCourses.jsx';
 import StudentRegistration from '../pages/student/Registration.jsx';
 import { getUserRole, isAuthenticated } from '../services/authService.js';
 import ProtectedRoute from './ProtectedRoute.jsx';
@@ -44,6 +45,16 @@ export default function AppRoutes() {
           <ProtectedRoute>
             <RoleRoute role="STUDENT">
               <StudentRegistration />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/my-courses"
+        element={
+          <ProtectedRoute>
+            <RoleRoute role="STUDENT">
+              <MyCourses />
             </RoleRoute>
           </ProtectedRoute>
         }

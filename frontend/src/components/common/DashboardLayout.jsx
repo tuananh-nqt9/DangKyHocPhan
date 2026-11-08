@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ChevronDown, LogOut } from 'lucide-react';
 import { clearAuthData, getCurrentUser, logout } from '../../services/authService.js';
 import ptitLogo from '../../assets/ptitlogo.png';
 
-export default function DashboardLayout({ role, pageTitle, children }) {
+export default function DashboardLayout({ role, pageTitle, children, fixedViewport = false }) {
   const navigate = useNavigate();
   const user = getCurrentUser();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -36,10 +36,27 @@ export default function DashboardLayout({ role, pageTitle, children }) {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white">
+    <main className={`${fixedViewport ? 'flex h-screen flex-col overflow-hidden' : 'min-h-screen'} bg-gray-50`}>
+      <header className="shrink-0 border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-3">
+          {isAdmin ? (
+            <div className="flex min-w-0 items-center gap-3">
+              <img
+                src={ptitLogo}
+                alt="Logo PTIT"
+                className="h-12 w-12 rounded-xl border border-red-100 bg-white object-contain"
+              />
+              <div className="min-w-0">
+                <p className="font-semibold text-gray-900">Đăng ký Học phần PTIT</p>
+                <p className="text-xs text-gray-500">Cổng quản trị viên</p>
+              </div>
+            </div>
+          ) : (
+            <Link
+              to="/student/dashboard"
+              aria-label="Về trang chủ sinh viên"
+              className="flex min-w-0 items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-red-600"
+            >
             <img
               src={ptitLogo}
               alt="Logo PTIT"
@@ -47,9 +64,10 @@ export default function DashboardLayout({ role, pageTitle, children }) {
             />
             <div className="min-w-0">
               <p className="font-semibold text-gray-900">Đăng ký Học phần PTIT</p>
-              <p className="text-xs text-gray-500">{isAdmin ? 'Cổng quản trị viên' : 'Cổng sinh viên'}</p>
+              <p className="text-xs text-gray-500">Cổng sinh viên</p>
             </div>
-          </div>
+            </Link>
+          )}
           {isAdmin && (
             <h1 className="mr-auto text-base font-semibold text-gray-900">{title}</h1>
           )}
@@ -83,7 +101,13 @@ export default function DashboardLayout({ role, pageTitle, children }) {
         </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <section
+        className={`mx-auto w-full max-w-6xl ${
+          fixedViewport
+            ? 'flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-4 py-5 sm:px-6'
+            : 'px-4 py-10 sm:px-6'
+        }`}
+      >
         {error && (
           <div role="alert" className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}

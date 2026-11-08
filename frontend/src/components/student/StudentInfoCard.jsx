@@ -2,7 +2,7 @@ import { BadgeCheck, IdCard, UserRound } from 'lucide-react';
 
 export default function StudentInfoCard({ user, sessionActive }) {
   return (
-    <section className="h-full min-h-[320px] rounded-2xl border border-gray-200 bg-white p-7 shadow-sm sm:p-8">
+    <section className="h-full min-h-80 rounded-2xl border border-gray-200 bg-white p-7 shadow-sm sm:p-8">
       <div className="flex items-start gap-4">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
           <IdCard className="h-6 w-6" aria-hidden="true" />

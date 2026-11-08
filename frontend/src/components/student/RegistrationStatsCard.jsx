@@ -1,8 +1,9 @@
-import { BookOpen, RefreshCw } from 'lucide-react';
+import { ArrowRight, BookOpen, RefreshCw } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function RegistrationStatsCard({ count, loading, error, onRetry }) {
   return (
-    <section className="h-full min-h-[320px] rounded-2xl border border-gray-200 bg-white p-7 shadow-sm sm:p-8">
+    <section className="flex h-full min-h-[320px] flex-col rounded-2xl border border-gray-200 bg-white p-7 shadow-sm sm:p-8">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-base font-semibold text-gray-900">Học phần đã đăng ký</h2>
@@ -38,6 +39,13 @@ export default function RegistrationStatsCard({ count, loading, error, onRetry }
           </p>
         </div>
       )}
+      <Link
+        to="/student/my-courses"
+        className="mt-auto inline-flex w-fit items-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+      >
+        Học phần của tôi
+        <ArrowRight className="h-4 w-4" aria-hidden="true" />
+      </Link>
     </section>
   );
 }
