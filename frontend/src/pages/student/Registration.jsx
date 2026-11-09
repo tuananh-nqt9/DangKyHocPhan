@@ -609,7 +609,7 @@ export default function StudentRegistration() {
     : detailSelection;
 
   return (
-    <DashboardLayout role="STUDENT" pageTitle="Đăng ký học phần">
+    <DashboardLayout role="STUDENT" pageTitle="Đăng ký học phần" stickyHeader>
       <div className="space-y-4 pb-32">
         <div>
           <Link

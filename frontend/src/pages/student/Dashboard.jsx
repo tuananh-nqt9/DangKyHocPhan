@@ -41,7 +41,7 @@ export default function StudentDashboard() {
   }, [loadRegistrationCount]);
 
   return (
-    <DashboardLayout role="STUDENT">
+    <DashboardLayout role="STUDENT" stickyHeader>
       <div className="space-y-6">
         <div className="grid items-stretch gap-6 md:grid-cols-2">
           <StudentInfoCard user={user} sessionActive={isAuthenticated()} />

@@ -5,7 +5,13 @@ import { clearAuthData, getCurrentUser, logout } from '../../services/authServic
 import ptitLogo from '../../assets/ptitlogo.png';
 import SiteFooter from './SiteFooter.jsx';
 
-export default function DashboardLayout({ role, pageTitle, children, fixedViewport = false }) {
+export default function DashboardLayout({
+  role,
+  pageTitle,
+  children,
+  fixedViewport = false,
+  stickyHeader = false,
+}) {
   const navigate = useNavigate();
   const user = getCurrentUser();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -38,7 +44,7 @@ export default function DashboardLayout({ role, pageTitle, children, fixedViewpo
 
   return (
     <main className={`${fixedViewport ? 'flex h-screen flex-col overflow-hidden' : 'flex min-h-screen flex-col'} bg-gray-50`}>
-      <header className="shrink-0 border-b border-gray-200 bg-white">
+      <header className={`shrink-0 border-b border-gray-200 bg-white ${stickyHeader ? 'sticky top-0 z-30' : ''}`}>
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
           {isAdmin ? (
             <div className="flex min-w-0 items-center gap-3">

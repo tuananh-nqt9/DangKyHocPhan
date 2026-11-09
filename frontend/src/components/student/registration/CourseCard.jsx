@@ -89,8 +89,7 @@ export default function CourseCard({
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span>
               Chưa hoàn thành học phần tiên quyết
-              {unmetPrerequisites.some((item) => item.course_name || item.course_code) &&
-                `: ${unmetPrerequisites.map((item) => item.course_name || item.course_code).filter(Boolean).join(', ')}`}
+              
             </span>
           </p>
         )}
