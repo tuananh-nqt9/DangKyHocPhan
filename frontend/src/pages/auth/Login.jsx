@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, User, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
 import { login, saveAuthData } from '../../services/authService';
 import ptitLogo from '../../assets/ptitlogo.png';
+import SiteFooter from '../../components/common/SiteFooter.jsx';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -84,14 +85,15 @@ export default function Login() {
   const ssoAuthUrl = import.meta.env.VITE_SSO_AUTH_URL;
 
   return (
-    <main className="relative min-h-screen bg-linear-to-br from-primary-50 via-white to-primary-100 flex items-center justify-center px-4 py-8">
+    <main className="relative flex min-h-screen flex-col bg-linear-to-br from-primary-50 via-white to-primary-100">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-200/30 rounded-full blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary-300/20 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative w-full max-w-md">
+      <div className="relative flex flex-1 items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md">
         {/* Logo / Header */}
         <div className="text-center mb-8">
           <img
@@ -270,11 +272,9 @@ export default function Login() {
           )}
         </div>
 
-        {/* Footer */}
-        <p className="text-center text-xs text-gray-400 mt-6">
-          Hệ thống Đăng ký Học phần Trực tuyến &copy; 2026
-        </p>
       </div>
+      </div>
+      <SiteFooter />
     </main>
   );
 }

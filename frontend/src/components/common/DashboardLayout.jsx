@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ChevronDown, LogOut } from 'lucide-react';
 import { clearAuthData, getCurrentUser, logout } from '../../services/authService.js';
 import ptitLogo from '../../assets/ptitlogo.png';
+import SiteFooter from './SiteFooter.jsx';
 
 export default function DashboardLayout({ role, pageTitle, children, fixedViewport = false }) {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export default function DashboardLayout({ role, pageTitle, children, fixedViewpo
   };
 
   return (
-    <main className={`${fixedViewport ? 'flex h-screen flex-col overflow-hidden' : 'min-h-screen'} bg-gray-50`}>
+    <main className={`${fixedViewport ? 'flex h-screen flex-col overflow-hidden' : 'flex min-h-screen flex-col'} bg-gray-50`}>
       <header className="shrink-0 border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
           {isAdmin ? (
@@ -105,7 +106,7 @@ export default function DashboardLayout({ role, pageTitle, children, fixedViewpo
         className={`mx-auto w-full max-w-6xl ${
           fixedViewport
             ? 'flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-4 py-5 sm:px-6'
-            : 'px-4 py-10 sm:px-6'
+            : 'flex-1 px-4 py-10 sm:px-6'
         }`}
       >
         {error && (
@@ -129,6 +130,7 @@ export default function DashboardLayout({ role, pageTitle, children, fixedViewpo
           </div>
         )}
       </section>
+      <SiteFooter />
     </main>
   );
 }

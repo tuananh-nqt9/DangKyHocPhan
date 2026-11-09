@@ -70,8 +70,8 @@ export default function CourseDetailModal({ course, loading, error, onRetry, onC
               <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4">
                 <BookOpen className="h-5 w-5 text-red-600" aria-hidden="true" />
                 <div>
-                  <p className="text-xs text-gray-500">Mã học phần · Tín chỉ</p>
-                  <p className="mt-1 text-sm font-medium text-gray-900">{course.course_code} · {course.credits}</p>
+                  <p className="text-xs text-gray-500">Mã học phần</p>
+                  <p className="mt-1 text-sm font-medium text-gray-900">{course.course_code}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4">
@@ -82,17 +82,19 @@ export default function CourseDetailModal({ course, loading, error, onRetry, onC
                 </div>
               </div>
               <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4">
-                <span className={`h-2.5 w-2.5 rounded-full ${course.status === 'OPEN' ? 'bg-green-500' : 'bg-gray-400'}`} />
+                <BookOpen className="h-5 w-5 text-red-600" aria-hidden="true" />
                 <div>
-                  <p className="text-xs text-gray-500">Trạng thái lớp</p>
-                  <p className="mt-1 text-sm font-medium text-gray-900">{course.status === 'OPEN' ? 'Đang mở' : 'Đã đóng'}</p>
+                  <p className="text-xs text-gray-500">Số tín chỉ</p>
+                  <p className="mt-1 text-sm font-medium text-gray-900">{course.credits}</p>
                 </div>
               </div>
               {course.registration_status && (
                 <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4">
                   <div>
                     <p className="text-xs text-gray-500">Trạng thái đăng ký của bạn</p>
-                    <p className="mt-1 text-sm font-medium text-gray-900">
+                    <p className={`mt-1 text-sm font-medium ${
+                      course.registration_status === 'REGISTERED' ? 'text-green-600' : 'text-red-600'
+                    }`}>
                       {course.registration_status === 'REGISTERED' ? 'Đã đăng ký' : 'Chưa đăng ký'}
                     </p>
                   </div>
@@ -134,7 +136,7 @@ export default function CourseDetailModal({ course, loading, error, onRetry, onC
                     <li key={item.course_code} className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 px-4 py-3 text-sm">
                       <span className="text-gray-700">{item.course_code} · {item.course_name}</span>
                       {typeof item.satisfied === 'boolean' && (
-                        <span className={item.satisfied ? 'font-medium text-green-700' : 'font-medium text-amber-700'}>
+                        <span className={item.satisfied ? 'font-medium text-green-700' : 'font-medium text-yellow-400'}>
                           {item.satisfied ? 'Đã hoàn thành' : 'Chưa hoàn thành'}
                         </span>
                       )}

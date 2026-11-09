@@ -284,7 +284,11 @@ export default function StudentRegistration() {
     setSelectedIds((current) => {
       const eligibleIds = new Set(
         selectableCourses
-          .filter((course) => course.status === 'OPEN' && course.registration_status !== 'REGISTERED')
+          .filter((course) =>
+            course.status === 'OPEN' &&
+            course.registration_status !== 'REGISTERED' &&
+            !course.prerequisites?.some((prerequisite) => prerequisite.satisfied === false),
+          )
           .map((course) => course.course_class_id),
       );
       const next = new Set([...current].filter((id) => eligibleIds.has(id)));
@@ -293,6 +297,13 @@ export default function StudentRegistration() {
   }, [selectableCourses]);
 
   const toggleCourse = useCallback((courseId) => {
+    const course = selectableCourses.find((item) => item.course_class_id === courseId);
+    if (
+      !selectedIds.has(courseId) &&
+      course?.prerequisites?.some((prerequisite) => prerequisite.satisfied === false)
+    ) {
+      return;
+    }
     if (scheduleConflicts.has(courseId)) return;
     setSelectedIds((current) => {
       const next = new Set(current);
@@ -300,7 +311,7 @@ export default function StudentRegistration() {
       else next.add(courseId);
       return next;
     });
-  }, [scheduleConflicts]);
+  }, [scheduleConflicts, selectableCourses, selectedIds]);
 
   const fetchCourseDetail = useCallback(async (course) => {
     setDetailSelection(course);

@@ -32,8 +32,10 @@ export default function CourseCard({
   const isOpen = course.status === 'OPEN';
   const isFull = course.remaining_seats === 0;
   const alreadyRegistered = course.registration_status === 'REGISTERED';
+  const unmetPrerequisites = (course.prerequisites || []).filter((item) => item.satisfied === false);
   const canSelect = isOpen && !alreadyRegistered;
-  const selectionBlocked = !canSelect || selectionDisabled || (Boolean(conflictWith) && !selected);
+  const selectionBlocked = !canSelect || selectionDisabled ||
+    (!selected && (unmetPrerequisites.length > 0 || Boolean(conflictWith)));
 
   return (
     <article
@@ -43,7 +45,10 @@ export default function CourseCard({
           : 'border-gray-200 bg-white hover:border-gray-300'
       } ${!selectionBlocked || selected ? 'cursor-pointer' : ''}`}
       onClick={() => {
-        if (!selectionDisabled && (selected || (!conflictWith && canSelect))) {
+        if (
+          !selectionDisabled &&
+          (selected || (canSelect && unmetPrerequisites.length === 0 && !conflictWith))
+        ) {
           onToggle(course.course_class_id);
         }
       }}
@@ -52,7 +57,9 @@ export default function CourseCard({
         type="button"
         onClick={(event) => {
           event.stopPropagation();
-          if (canSelect && !selectionDisabled) onToggle(course.course_class_id);
+          if (canSelect && !selectionDisabled && (selected || unmetPrerequisites.length === 0)) {
+            onToggle(course.course_class_id);
+          }
         }}
         disabled={selectionBlocked}
         aria-pressed={selected}
@@ -75,6 +82,16 @@ export default function CourseCard({
           <p className="mt-1 flex items-start gap-1.5 text-xs font-medium text-yellow-400">
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span>Trùng lịch</span>
+          </p>
+        )}
+        {unmetPrerequisites.length > 0 && (
+          <p className="mt-1 flex items-start gap-1.5 text-xs font-medium text-yellow-400">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <span>
+              Chưa hoàn thành học phần tiên quyết
+              {unmetPrerequisites.some((item) => item.course_name || item.course_code) &&
+                `: ${unmetPrerequisites.map((item) => item.course_name || item.course_code).filter(Boolean).join(', ')}`}
+            </span>
           </p>
         )}
         {alreadyRegistered && (
