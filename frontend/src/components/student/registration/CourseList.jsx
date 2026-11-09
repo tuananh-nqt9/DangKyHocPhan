@@ -12,6 +12,7 @@ export default function CourseList({
   onDetails,
   selectedIds,
   scheduleConflicts,
+  duplicateCourseConflicts,
   onToggle,
   registeringIds,
   cancellingIds,
@@ -78,6 +79,7 @@ export default function CourseList({
             course={course}
             selected={selectedIds.has(course.course_class_id)}
             conflictWith={scheduleConflicts.get(course.course_class_id)}
+            duplicateCourseWith={duplicateCourseConflicts.get(course.course_class_id)}
             selectionDisabled={selectionDisabled}
             registering={registeringIds.has(course.course_class_id)}
             cancelling={cancellingIds.has(course.course_class_id)}

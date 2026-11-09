@@ -1,2 +1,0 @@
-// Admin Test Results page
-

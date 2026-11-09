@@ -26,7 +26,7 @@ const registrationMessages = {
   CLASS_FULL: 'Lớp học phần đã hết chỗ.',
   PREREQUISITE_NOT_MET: 'Bạn chưa hoàn thành môn học tiên quyết.',
   SCHEDULE_CONFLICT: 'Lịch học của lớp này bị trùng với học phần bạn đã đăng ký.',
-  ALREADY_REGISTERED: 'Bạn đã đăng ký lớp học phần này.',
+  ALREADY_REGISTERED: 'Bạn đã đăng ký lớp học phần này hoặc một lớp khác của cùng học phần.',
   REQUEST_IN_PROGRESS: 'Yêu cầu đăng ký đang được xử lý. Vui lòng chờ và thử lại.',
   SERVICE_BUSY: 'Hệ thống đang bận, vui lòng thử lại sau.',
   REGISTRATION_CLOSED: 'Lớp học phần đã đóng đăng ký.',
@@ -233,6 +233,17 @@ export default function StudentRegistration() {
     [activeRegistrations],
   );
 
+  const activeCourseCodes = useMemo(() => {
+    const courseCodeByClassId = new Map(
+      courses.map((course) => [course.course_class_id, course.course_code]),
+    );
+    return new Set(
+      activeRegistrations
+        .map((registration) => courseCodeByClassId.get(registration.course_class_id))
+        .filter(Boolean),
+    );
+  }, [activeRegistrations, courses]);
+
   const selectableCourses = useMemo(
     () =>
       courses.map((course) =>
@@ -242,9 +253,12 @@ export default function StudentRegistration() {
             registration_status: 'REGISTERED',
             registration_id: activeClassIds.get(course.course_class_id).registration_id,
           }
-          : course,
+          : {
+            ...course,
+            duplicate_course_registered: activeCourseCodes.has(course.course_code),
+          },
       ),
-    [courses, activeClassIds],
+    [courses, activeClassIds, activeCourseCodes],
   );
 
   const filteredCourses = useMemo(() => {
@@ -278,17 +292,38 @@ export default function StudentRegistration() {
     }
     return conflicts;
   }, [selectableCourses, selectedIds]);
+  const duplicateCourseConflicts = useMemo(() => {
+    const selectedByCourseCode = new Map(
+      selectableCourses
+        .filter((course) => selectedIds.has(course.course_class_id))
+        .map((course) => [course.course_code, course]),
+    );
+    return new Map(
+      selectableCourses
+        .filter((course) => !selectedIds.has(course.course_class_id))
+        .flatMap((course) => {
+          const selectedCourse = selectedByCourseCode.get(course.course_code);
+          return selectedCourse ? [[course.course_class_id, selectedCourse]] : [];
+        }),
+    );
+  }, [selectableCourses, selectedIds]);
   const selectedCredits = selectedCourses.reduce((total, course) => total + (Number(course.credits) || 0), 0);
 
   useEffect(() => {
     setSelectedIds((current) => {
+      const selectedCourseCodes = new Set();
       const eligibleIds = new Set(
         selectableCourses
-          .filter((course) =>
-            course.status === 'OPEN' &&
-            course.registration_status !== 'REGISTERED' &&
-            !course.prerequisites?.some((prerequisite) => prerequisite.satisfied === false),
-          )
+          .filter((course) => {
+            const eligible = course.status === 'OPEN' &&
+              course.registration_status !== 'REGISTERED' &&
+              !course.duplicate_course_registered &&
+              !course.prerequisites?.some((prerequisite) => prerequisite.satisfied === false);
+            if (!eligible || !current.has(course.course_class_id)) return false;
+            if (selectedCourseCodes.has(course.course_code)) return false;
+            selectedCourseCodes.add(course.course_code);
+            return true;
+          })
           .map((course) => course.course_class_id),
       );
       const next = new Set([...current].filter((id) => eligibleIds.has(id)));
@@ -300,18 +335,23 @@ export default function StudentRegistration() {
     const course = selectableCourses.find((item) => item.course_class_id === courseId);
     if (
       !selectedIds.has(courseId) &&
-      course?.prerequisites?.some((prerequisite) => prerequisite.satisfied === false)
+      (course?.duplicate_course_registered ||
+        selectableCourses.some((item) =>
+          selectedIds.has(item.course_class_id) &&
+          item.course_code === course?.course_code,
+        ) ||
+        course?.prerequisites?.some((prerequisite) => prerequisite.satisfied === false))
     ) {
       return;
     }
-    if (scheduleConflicts.has(courseId)) return;
+    if (scheduleConflicts.has(courseId) || duplicateCourseConflicts.has(courseId)) return;
     setSelectedIds((current) => {
       const next = new Set(current);
       if (next.has(courseId)) next.delete(courseId);
       else next.add(courseId);
       return next;
     });
-  }, [scheduleConflicts, selectableCourses, selectedIds]);
+  }, [duplicateCourseConflicts, scheduleConflicts, selectableCourses, selectedIds]);
 
   const fetchCourseDetail = useCallback(async (course) => {
     setDetailSelection(course);
@@ -717,6 +757,7 @@ export default function StudentRegistration() {
           onDetails={fetchCourseDetail}
           selectedIds={selectedIds}
           scheduleConflicts={scheduleConflicts}
+          duplicateCourseConflicts={duplicateCourseConflicts}
           onToggle={toggleCourse}
           registeringIds={registeringIds}
           cancellingIds={cancellingIds}

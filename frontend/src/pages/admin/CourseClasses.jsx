@@ -1,2 +1,0 @@
-// Admin Course Classes page
-

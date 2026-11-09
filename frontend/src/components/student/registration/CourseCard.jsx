@@ -21,6 +21,7 @@ export default function CourseCard({
   course,
   selected,
   conflictWith,
+  duplicateCourseWith,
   selectionDisabled,
   registering,
   cancelling,
@@ -32,10 +33,12 @@ export default function CourseCard({
   const isOpen = course.status === 'OPEN';
   const isFull = course.remaining_seats === 0;
   const alreadyRegistered = course.registration_status === 'REGISTERED';
+  const duplicateCourseRegistered = Boolean(course.duplicate_course_registered);
   const unmetPrerequisites = (course.prerequisites || []).filter((item) => item.satisfied === false);
-  const canSelect = isOpen && !alreadyRegistered;
+  const canSelect = isOpen && !alreadyRegistered && !duplicateCourseRegistered;
   const selectionBlocked = !canSelect || selectionDisabled ||
-    (!selected && (unmetPrerequisites.length > 0 || Boolean(conflictWith)));
+    (!selected && (unmetPrerequisites.length > 0 || Boolean(conflictWith) ||
+      Boolean(duplicateCourseWith)));
 
   return (
     <article
@@ -47,7 +50,8 @@ export default function CourseCard({
       onClick={() => {
         if (
           !selectionDisabled &&
-          (selected || (canSelect && unmetPrerequisites.length === 0 && !conflictWith))
+          (selected || (canSelect && unmetPrerequisites.length === 0 && !conflictWith &&
+            !duplicateCourseWith))
         ) {
           onToggle(course.course_class_id);
         }
@@ -95,6 +99,14 @@ export default function CourseCard({
         )}
         {alreadyRegistered && (
           <p className="mt-1 text-xs font-medium text-green-700">Bạn đã đăng ký lớp này</p>
+        )}
+        {!alreadyRegistered && duplicateCourseRegistered && (
+          <p className="mt-1 text-xs font-medium text-yellow-500">Trùng học phần đã đăng ký</p>
+        )}
+        {!selected && duplicateCourseWith && (
+          <p className="mt-1 text-xs font-medium text-yellow-500">
+            Trùng học phần với lớp đã chọn
+          </p>
         )}
       </div>
 

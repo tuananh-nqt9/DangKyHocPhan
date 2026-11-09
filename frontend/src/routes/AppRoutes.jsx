@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from '../pages/auth/Login.jsx';
-import AdminDashboard from '../pages/admin/Dashboard.jsx';
+import AdminDashboard from '../pages/admin/Dashboard.tsx';
+import AdminCourseClasses from '../pages/admin/CourseClasses.tsx';
+import AdminTesting from '../pages/admin/Testing.tsx';
 import StudentDashboard from '../pages/student/Dashboard.jsx';
 import MyCourses from '../pages/student/MyCourses.jsx';
 import StudentRegistration from '../pages/student/Registration.jsx';
@@ -69,6 +71,27 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/admin/course-classes"
+        element={
+          <ProtectedRoute>
+            <RoleRoute role="ADMIN">
+              <AdminCourseClasses />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/testing"
+        element={
+          <ProtectedRoute>
+            <RoleRoute role="ADMIN">
+              <AdminTesting />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/admin/test-results" element={<Navigate to="/admin/testing?tab=results" replace />} />
       <Route path="*" element={<HomeRedirect />} />
     </Routes>
   );
