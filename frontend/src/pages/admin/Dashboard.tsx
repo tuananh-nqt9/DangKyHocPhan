@@ -169,8 +169,7 @@ export default function AdminDashboard() {
           <section className="overflow-hidden border border-gray-200 bg-white shadow-sm">
             <div className="flex items-center justify-between gap-4 border-b border-gray-100 px-5 py-4">
               <div>
-                <h3 className="font-semibold text-gray-900">Lớp học phần nổi bật</h3>
-                <p className="mt-1 text-xs text-gray-500">Xếp theo số lượng đăng ký từ API.</p>
+                <h3 className="font-semibold text-red-700">Lớp học phần nổi bật</h3>
               </div>
               <Link to="/admin/course-classes" className="inline-flex items-center gap-1 text-sm font-semibold text-red-700 hover:text-red-800">
                 Quản lý lớp <ArrowRight className="h-4 w-4" aria-hidden="true" />

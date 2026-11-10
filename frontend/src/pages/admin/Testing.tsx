@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Download, FileUp, FlaskConical, SlidersHorizontal } from 'lucide-react';
 import DashboardLayout from '../../components/common/DashboardLayout.jsx';
@@ -6,6 +6,22 @@ import { getAllAdminCourseClasses } from '../../services/adminService';
 import type { CourseClass } from '../../services/adminTypes';
 
 type TestTab = 'configuration' | 'results';
+const TestingLineChart = lazy(() => import('./TestingLineChart'));
+
+const chartMetricDefinitions = [
+  { label: 'Tổng request', aliases: ['total_requests'], color: '#334155' },
+  { label: 'Request thành công', aliases: ['successful_requests', 'success'], color: '#16a34a' },
+  { label: 'Request thất bại', aliases: ['failed_requests', 'failure'], color: '#dc2626' },
+  { label: 'Tỷ lệ thành công (%)', aliases: ['success_rate_percent', 'success_rate_pct'], color: '#7c3aed' },
+  { label: 'Average response time (ms)', aliases: ['avg_response_time_ms', 'average_response_time_ms'], color: '#2563eb' },
+  { label: 'P95 (ms)', aliases: ['p95_ms'], color: '#ea580c' },
+  { label: 'P99 (ms)', aliases: ['p99_ms'], color: '#be123c' },
+  { label: 'RPS', aliases: ['rps', 'requests_per_second'], color: '#0891b2' },
+] as const;
+
+function normalizeHeader(value: string): string {
+  return value.trim().toLocaleLowerCase().replace(/[\s-]+/g, '_');
+}
 
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
@@ -78,6 +94,7 @@ export default function Testing() {
   const [csv, setCsv] = useState('');
   const [csvRows, setCsvRows] = useState<string[][]>([]);
   const [csvError, setCsvError] = useState('');
+  const [selectedChartMetric, setSelectedChartMetric] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -101,8 +118,7 @@ export default function Testing() {
   ], []);
   const importedSummary = useMemo(() => {
     if (csvRows.length < 2) return null;
-    const normalize = (value: string) => value.trim().toLocaleLowerCase().replace(/[\s-]+/g, '_');
-    const headers = csvRows[0].map(normalize);
+    const headers = csvRows[0].map(normalizeHeader);
     const values = csvRows[1];
     const read = (...names: string[]) => {
       const index = headers.findIndex((header) => names.includes(header));
@@ -127,6 +143,35 @@ export default function Testing() {
       rps: read('rps', 'requests_per_second'),
     };
   }, [csvRows]);
+  const chartMetrics = useMemo(() => {
+    if (csvRows.length < 2) return [];
+    const headers = csvRows[0].map(normalizeHeader);
+    return chartMetricDefinitions.flatMap((definition) => {
+      const index = headers.findIndex((header) => definition.aliases.some((alias) => alias === header));
+      if (index < 0 || !csvRows.slice(1).some((row) => row[index]?.trim() !== '' && Number.isFinite(Number(row[index])))) {
+        return [];
+      }
+      return [{ key: headers[index], index, label: definition.label, color: definition.color }];
+    });
+  }, [csvRows]);
+  const selectedMetric = chartMetrics.find((metric) => metric.key === selectedChartMetric) ?? chartMetrics[0];
+  const chartData = useMemo(() => {
+    if (csvRows.length < 2 || !selectedMetric) return [];
+    const headers = csvRows[0].map(normalizeHeader);
+    const labelIndex = headers.findIndex((header) =>
+      ['run_at', 'timestamp', 'time', 'date', 'run_id', 'run', 'iteration'].includes(header),
+    );
+    return csvRows.slice(1)
+      .map((row, index) => {
+        const rawValue = row[selectedMetric.index]?.trim();
+        const value = rawValue ? Number(rawValue) : Number.NaN;
+        const label = labelIndex >= 0 && row[labelIndex]?.trim()
+          ? row[labelIndex].trim()
+          : `Lượt ${index + 1}`;
+        return { label, value };
+      })
+      .filter((point) => Number.isFinite(point.value));
+  }, [csvRows, selectedMetric]);
 
   const chooseTab = (nextTab: TestTab) => {
     setSearchParams({ tab: nextTab }, { replace: true });
@@ -239,6 +284,43 @@ export default function Testing() {
 
             {csvRows.length ? (
               <>
+                <section className="border border-gray-200 bg-white p-5 shadow-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Biểu đồ kết quả kiểm thử</h3>
+                      <p className="mt-1 text-sm text-gray-500">Chọn chỉ số để xem xu hướng theo các dòng dữ liệu trong CSV.</p>
+                    </div>
+                    {chartMetrics.length > 0 && (
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        Chỉ số
+                        <select
+                          value={selectedMetric?.key ?? ''}
+                          onChange={(event) => setSelectedChartMetric(event.target.value)}
+                          className="border border-gray-200 bg-white px-3 py-2 outline-none focus:border-red-400"
+                        >
+                          {chartMetrics.map((metric) => (
+                            <option key={metric.key} value={metric.key}>{metric.label}</option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
+                  </div>
+                  {selectedMetric && chartData.length > 0 ? (
+                    <div className="mt-5 h-80 w-full">
+                      <Suspense fallback={<div className="h-full animate-pulse bg-gray-50" role="status">Đang tải biểu đồ...</div>}>
+                        <TestingLineChart
+                          data={chartData}
+                          metricLabel={selectedMetric.label}
+                          color={selectedMetric.color}
+                        />
+                      </Suspense>
+                    </div>
+                  ) : (
+                    <p className="mt-5 border border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500">
+                      CSV chưa có cột số liệu kiểm thử phù hợp để vẽ biểu đồ.
+                    </p>
+                  )}
+                </section>
                 {importedSummary && Object.values(importedSummary).some((value) => value !== undefined) && (
                   <section className="space-y-4">
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
