@@ -73,3 +73,22 @@ export default defineConfig([
 ])
 
 ```
+
+## Triển khai Frontend
+
+1. Cài Node.js và chạy `npm install` trong thư mục `frontend`.
+2. Tạo file `.env.production`, khai báo địa chỉ Backend:
+
+   ```env
+   VITE_API_BASE_URL=https://<dia-chi-backend>/api
+   ```
+
+3. Kiểm tra và tạo bản production:
+
+   ```bash
+   npm run lint
+   npm run build
+   ```
+
+4. Đưa nội dung thư mục `dist` lên dịch vụ hosting tĩnh. Cấu hình máy chủ chuyển các đường dẫn frontend không khớp tệp về `index.html` để các trang React Router hoạt động khi tải lại.
+5. Đảm bảo Backend cho phép domain frontend trong cấu hình CORS và hai bên sử dụng HTTPS khi triển khai công khai.

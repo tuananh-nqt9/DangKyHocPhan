@@ -237,7 +237,6 @@ export default function Testing() {
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)]">
             <section className="border border-gray-200 bg-white p-5 shadow-sm">
               <h3 className="font-semibold text-gray-900">Cấu hình kiểm thử tải</h3>
-              <p className="mt-1 text-sm text-gray-500">Tham số chỉ được xuất thành tệp cấu hình; frontend không tự chạy k6.</p>
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 <label className="text-sm font-medium text-gray-700">Virtual Users (VUs)
                   <input type="number" min={1} max={1000} step={1} value={vus} onChange={(event) => setVus(event.target.value)} className="mt-1.5 w-full border border-gray-200 px-3 py-2.5 outline-none focus:border-red-400" />

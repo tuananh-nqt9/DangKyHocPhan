@@ -5,6 +5,11 @@ import { login, saveAuthData } from '../../services/authService';
 import ptitLogo from '../../assets/ptitlogo.png';
 import SiteFooter from '../../components/common/SiteFooter.jsx';
 
+const ACCOUNT_ID_PATTERN = /^(SV|AD)[0-9]{3,6}$/;
+const getLoginFailureMessage = (role) => role === 'ADMIN'
+  ? 'Tài khoản không chính xác, vui lòng kiểm tra lại mã quản trị viên và mật khẩu'
+  : 'Tài khoản không chính xác, vui lòng kiểm tra lại mã sinh viên và mật khẩu';
+
 export default function Login() {
   const navigate = useNavigate();
 
@@ -21,15 +26,19 @@ export default function Login() {
 
     // Client-side validation
     if (!studentId.trim()) {
-      setError('Vui lòng nhập mã sinh viên / quản trị viên.');
+      setError(getLoginFailureMessage(role));
+      return;
+    }
+    if (!ACCOUNT_ID_PATTERN.test(studentId.trim())) {
+      setError(getLoginFailureMessage(role));
       return;
     }
     if (!password) {
-      setError('Vui lòng nhập mật khẩu.');
+      setError(getLoginFailureMessage(role));
       return;
     }
-    if (password.length < 8 || password.length > 128) {
-      setError('Mật khẩu phải có độ dài từ 8 đến 128 ký tự.');
+    if (password.length < 8) {
+      setError(getLoginFailureMessage(role));
       return;
     }
 
@@ -46,11 +55,7 @@ export default function Login() {
 
       // Verify role matches selection
       if (userRole !== role) {
-        setError(
-          role === 'ADMIN'
-            ? 'Tài khoản này không có quyền quản trị viên.'
-            : 'Tài khoản này là quản trị viên. Vui lòng chọn vai trò Admin.',
-        );
+        setError(getLoginFailureMessage(role));
         setLoading(false);
         return;
       }
@@ -66,7 +71,7 @@ export default function Login() {
     } catch (err) {
       const apiError = err.response?.data;
       if (apiError?.code === 'UNAUTHORIZED' || apiError?.code === 'INVALID_CREDENTIALS') {
-        setError('Sai mã sinh viên hoặc mật khẩu. Vui lòng thử lại.');
+        setError(getLoginFailureMessage(role));
       } else if (apiError?.code === 'VALIDATION_ERROR') {
         const fieldErrors = apiError.errors?.map((e) => e.message).join('. ');
         setError(fieldErrors || 'Dữ liệu không hợp lệ.');
@@ -102,7 +107,7 @@ export default function Login() {
             className="mx-auto mb-4 h-20 w-20 rounded-2xl border border-red-100 bg-white object-contain shadow-lg shadow-primary-500/10"
           />
           <h1 className="text-2xl font-bold text-gray-900">Đăng ký Học phần PTIT</h1>
-          <p className="text-gray-500 mt-1 text-sm">Đăng nhập để tiếp tục đăng ký học phần</p>
+          <p className="text-gray-500 mt-1 text-sm">Đăng nhập để tiếp tục</p>
         </div>
 
         {/* Login Card */}
@@ -166,6 +171,7 @@ export default function Login() {
                 <input
                   id="studentId"
                   type="text"
+                  maxLength={8}
                   value={studentId}
                   onChange={(e) => setStudentId(e.target.value.toUpperCase())}
                   placeholder={role === 'ADMIN' ? 'Nhập mã Admin...' : 'Nhập mã sinh viên...'}

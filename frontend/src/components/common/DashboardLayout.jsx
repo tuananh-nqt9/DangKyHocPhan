@@ -46,7 +46,7 @@ export default function DashboardLayout({
   return (
     <main className={`${fixedViewport ? 'flex h-screen flex-col overflow-hidden' : 'flex min-h-screen flex-col'} bg-gray-50`}>
       <header className={`shrink-0 border-b border-gray-200 bg-white ${stickyHeader ? 'sticky top-0 z-30' : ''}`}>
-        <div className={`${isAdmin ? 'w-full' : 'mx-auto max-w-6xl'} flex flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6`}>
+        <div className="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
           {isAdmin ? (
             <div className="flex min-w-0 items-center gap-3">
               <img
